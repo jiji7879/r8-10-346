@@ -1,0 +1,15 @@
+# build products
+verify/count
+verify/verify
+verify/verify2
+verify/enum
+*.o
+*.aux
+*.log
+*.fdb_latexmk
+*.fls
+*.out
+
+# scratch
+/tmp/
+*.best.txt

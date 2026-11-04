@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use these colourings, please cite this work and the papers it builds on (Cremer 2026; Kuznetsov 2016; Radziszowski, DS1 rev. 18)."
+title: "R(8,10) >= 346: a colouring of K_345 with no red K_8 and no blue K_10"
+abstract: >-
+  We give a colouring of the edges of K_345 containing no red K_8 and no blue K_10,
+  which proves R(8,10) >= 346. The previous bound, R(8,10) >= 345, is due to Cremer
+  (2026), who improved the value 343 recorded in revision 18 of Radziszowski's dynamic
+  survey. Our colouring is obtained by the same device, applied once more: add one
+  vertex to Cremer's colouring of K_344 and repair the monochromatic cliques that
+  appear.
+authors:
+  - family-names: "Lai"
+    given-names: "David"
+    email: "davidlai911@gmail.com"
+date-released: "2026-11-03"
+license: "MIT"
+keywords:
+  - Ramsey numbers
+  - combinatorics
+  - lower bounds
+  - monochromatic cliques
+references:
+  - type: article
+    title: "Lower bounds for Ramsey numbers: R(6,8) >= 135 and R(8,10) >= 345"
+    authors:
+      - family-names: "Cremer"
+        given-names: "Fritz"
+    year: 2026
+    notes: "arXiv:2610.12122"
+  - type: article
+    title: "Computational lower limits on small Ramsey numbers"
+    authors:
+      - family-names: "Kuznetsov"
+        given-names: "Eugene"
+    year: 2016
+    notes: "arXiv:1505.07186"
+  - type: article
+    title: "Small Ramsey numbers"
+    authors:
+      - family-names: "Radziszowski"
+        given-names: "Stanislaw P."
+    year: 2026
+    notes: "Electronic Journal of Combinatorics, Dynamic Survey DS1, revision 18"

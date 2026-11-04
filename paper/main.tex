@@ -1,0 +1,396 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=2pt,topsep=3pt,parsep=0pt}
+\setlist[enumerate]{itemsep=2pt,topsep=3pt,parsep=0pt}
+
+\newcommand{\R}{R}
+\newcommand{\K}{K}
+\newcommand{\omegared}{\omega_{\mathrm{red}}}
+\newcommand{\omegablue}{\omega_{\mathrm{blue}}}
+
+\title{$R(8,10)\ge 346$: a colouring of $K_{345}$ with no red $K_8$ and no blue $K_{10}$}
+\author{%
+  \normalsize David Lai\\
+  \normalsize \texttt{davidlai911@gmail.com}
+}
+\date{3 November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We describe an edge colouring of the complete graph $K_{345}$ containing no red $K_8$ and no blue
+$K_{10}$, which proves $\R(8,10)\ge 346$. The previous bound, $\R(8,10)\ge 345$, is due to Cremer
+\cite{cremer}, improving the value $343$ recorded in revision~18 of Radziszowski's dynamic survey
+\cite{ds1}. Our colouring is obtained by the same device, applied once more: add one vertex to
+Cremer's colouring of $K_{344}$ and repair the monochromatic cliques that appear. The added vertex
+creates $29\,814$ blue $K_{10}$'s, and the repair reduces that count to zero. We report the colouring,
+four independent verifications of it, and the search trajectory, including the one element of the
+search that appeared to be decisive: restarting from the best colouring found so far with fresh
+random seeds, round after round.
+\end{abstract}
+
+\section{Introduction}
+
+Write $\R(r,s)$ for the least $n$ such that every red/blue colouring of the edges of $K_n$ contains a
+red $K_r$ or a blue $K_s$. An \emph{$(r,s)$-colouring} of $K_n$ is one containing neither, and shows
+$\R(r,s)\ge n+1$. Table~2.1 of Radziszowski's dynamic survey \cite{ds1}, in its current revision,
+lists
+\[
+  343 \;\le\; \R(8,10) \;\le\; 4402 .
+\]
+The lower bound $343$ is due to Kuznetsov \cite{kuznetsov}, whose witness is a $(8,10)$-colouring of
+$K_{342}$ that is circulant: $\{i,j\}$ is red exactly when $\min(|i-j|,342-|i-j|)$ lies in a fixed set
+of $76$ distances. Machine search has supplied a number of nearby entries in the same table; Nagda,
+Raghavan and Thakurta \cite{nagda}, for instance, improved nine bounds of the form $R(3,s)$ and
+$R(4,s)$. Cremer \cite{cremer} observed that adding a single vertex to that colouring, joined
+by a blue edge, produces $10\,146$ blue $K_{10}$'s, and that local search can remove all of them; the
+resulting colouring of $K_{343}$ proves $\R(8,10)\ge 344$. Adding one further vertex and repeating
+the process gives a colouring of $K_{344}$ and the bound $\R(8,10)\ge 345$ \cite{cremer}.
+
+This note records the next step. Starting from Cremer's colouring of $K_{344}$, adding one vertex
+creates $29\,814$ blue $K_{10}$'s --- the exact minimum over all $2\cdot 344$ choices of which vertex
+to copy and which colour to give the joining edge --- and exact-conflict local search reduces that
+number to zero. The result is a $(8,10)$-colouring of $K_{345}$:
+
+\begin{center}
+\fbox{\parbox{0.92\textwidth}{
+\textbf{Theorem.} $\R(8,10)\ge 346$.
+}}
+\end{center}
+
+Section~\ref{sec:colouring} states the colouring and its basic invariants;
+Section~\ref{sec:verification} records four independent verifications;
+Section~\ref{sec:method} describes how the colouring was found and what in the search mattered;
+Section~\ref{sec:ai} describes the AI system that ran the search and what it contributed;
+Section~\ref{sec:not} says what the computation does not establish; and
+Section~\ref{sec:data} lists the artefacts needed to reproduce the result; and
+Appendix~\ref{app:distance} records an exact bounded-distance screen of the same one-vertex step on
+six smaller cells, which shows how far a repair must travel before it can succeed at all.
+
+\paragraph{Provenance.}
+The search code was written and run by an AI agent under the author's direction, following the same
+arrangement described in Section~5 of \cite{cremer}. The screening stage was a multi-agent run; the
+final descent was not. Section~\ref{sec:ai} describes both, and what each contributed. Every number
+in this note was regenerated and checked independently of the search process before being recorded
+here; Section~\ref{sec:verification} specifies the checkers, and Section~\ref{sec:data} lists the
+artefacts needed to reproduce or refute the result.
+
+\section{The colouring}\label{sec:colouring}
+
+The colouring is stored as a $345\times 345$ matrix $M$ with entries in $\{0,1\}$, symmetric, with
+zero diagonal, where $M_{ij}=1$ means that $\{i,j\}$ is red. Its invariants are as follows.
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+vertices & $345$\\
+red edges & $26\,045$\\
+blue edges & $33\,295$\\
+$\omegared$ (largest red clique) & $7$\\
+$\omegablue$ (largest blue clique) & $9$\\
+red degrees & $146$ to $160$, mean $150.99$\\
+distinct red degrees & $15$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Since $\omegared=7<8$ and $\omegablue=9<10$, the colouring contains no red $K_8$ and no blue
+$K_{10}$, so $\R(8,10)\ge 346$.
+
+As in \cite{cremer} we note that the red graph is not circulant: its red degrees take $15$ distinct
+values, so no relabelling makes it invariant under a cyclic shift. Nor is it a near-copy of any
+colourings the search passed through: it differs from the $6$-conflict state it was built from in
+$1\,032$ edges and from a $1$-conflict state found alongside it in $1\,226$ (Section~\ref{sec:method}).
+
+\section{Verification}\label{sec:verification}
+
+The colouring was verified by four programs, written independently of one another and of the search
+code.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+checker & method & result\\
+\midrule
+\texttt{count} & exhaustive enumeration of red $K_8$, blue $K_{10}$ & $0$, $0$\\
+\texttt{verify} & maximum-clique branch and bound & $\omegared=7$, $\omegablue=9$\\
+\texttt{verify2} & target-size DFS, independent code & no red $K_8$, no blue $K_{10}$\\
+\texttt{enum} & independent clique enumerator & $0$ conflicts\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The two count-based checkers agree with the two structural ones: a colouring with $\omegared=7$ and
+$\omegablue=9$ contains no forbidden clique, and the counts confirm the same directly. To indicate the
+cost of an independent re-check, \texttt{verify2} searched $10\,471\,027$ nodes for a red $K_8$ and
+$195\,066\,549$ for a blue $K_{10}$ on a single core; the blue search is two orders of magnitude
+larger, as expected when the forbidden blue clique is two vertices bigger.
+
+The files were also decoded from their graph6 representation \cite{networkx} and compared edge by
+edge with the matrix form, so that the two deposited encodings are known to carry the same graph.
+
+\section{How the colouring was found}\label{sec:method}
+
+\paragraph{The setting.}
+A \emph{conflict} is a monochromatic clique of a forbidden size: a red $K_8$ or a blue $K_{10}$.
+The engine used here was written during the screening stage described in \S\ref{sec:ai}.
+The search keeps the complete set of conflicts, together with the number of conflicts lying on each
+edge, so that the effect of flipping any edge is computed exactly rather than sampled. One iteration
+chooses a conflict at random with probability proportional to $w\,|K|$ over the two colours, samples
+up to $32$ of its edges, and flips the edge of least weighted exact change $\delta$, accepting it if
+$\delta\le 0$ or with Metropolis probability $\exp(-\delta/T)$, where $T=0.25+\min(2.5,t/100)$ and
+$t$ counts iterations since the last improvement; the flipped edge is made tabu for $5$ to $19$
+iterations. The weights are $w_{\mathrm{red}}=\binom{10}{2}/\binom{8}{2}=45/28$ and
+$w_{\mathrm{blue}}=1$. When no improvement has occurred for $1\,000$ iterations, the search restores
+the best colouring found so far, performs eight conflict-directed random flips, clears the tabu list
+and re-randomises the red weight; in addition, a \emph{patch} move occasionally randomises the colours
+of pairs inside a set of up to eight vertices chosen around a vertex with probability proportional to
+its conflict count, and then repairs freely.
+
+\paragraph{The first step, exactly.}
+Copying a vertex $v$ and joining the copy $v'$ to $v$ by an edge of colour $c$ creates a conflict
+$\{v,v'\}\cup C$ for each $c$-clique $C$ of size $6$ (for red) or $8$ (for blue) inside $N_c(v)$, and
+nothing else. One clique pass per vertex and colour therefore gives all $2n$ twin costs exactly. For
+Cremer's $K_{344}$ colouring the minimum over all $688$ choices is $29\,814$, attained by the blue
+twin of vertex $335$; the cheapest red twin costs $41\,479$. The spread between twins is large, so
+this choice is worth making exactly.
+
+\paragraph{The descent.}
+From $29\,814$ conflicts the search descended as follows. Each row is a round of one or more
+single-threaded segments; within a round the best colouring of the previous round is the input, and
+the random seeds are new.
+
+\begin{center}
+\begin{tabular}{@{}rlll@{}}
+\toprule
+conflicts & round & lanes & wall clock\\
+\midrule
+$29\,814 \to 97$ & pilot, 13 segments, 11 seeds & 1 & $\approx 102$ CPU-minutes\\
+$97 \to 96$ & single 90-second segment & 1 & $90$ s\\
+$96 \to 41$ & round 1 & 4 & $\approx 2$ h\\
+$41 \to 23$ & round 2 & 4 & $\approx 2$ h\\
+$23 \to 6$ & round 3 & 4 & $\approx 2$ h\\
+$6 \to 0$ & round 4 & 4 & $\approx 2$ h\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The colouring that achieves zero conflicts comes from the segment that started at the $6$-conflict
+state and reached zero at iteration $159\,966$ after $2\,770$ seconds, its conflict count falling as
+$6\to5\to4\to3\to2\to1\to0$. The colours moved a long way in the process: the final colouring
+differs from the $6$-conflict state it started from in $1\,032$ edges, and from a $1$-conflict
+colouring found in a parallel lane in $1\,226$ edges. Two colourings that are each within one
+monochromatic clique of being valid can thus be separated by more than a thousand edge changes, so
+the successful colouring is not a small repair of anything the search had already seen. For
+comparison, the same engine had earlier reduced an $11$-conflict state to $2$ and then made no further
+progress for two thousand seconds.
+
+\paragraph{What mattered.}
+Two things, in our assessment.
+
+First, \emph{restarts from the best state with fresh seeds}. A single long segment is misleading here.
+In one run the improvement rate collapsed to $0.003$ conflicts per $100$ seconds at $97$ conflicts, a
+profile that reads as convergence to a floor. It was not: restarting from that same colouring with new
+seeds reached $41$ conflicts within two hours, and three further rounds reached zero. Every round of
+fresh seeds found a deeper minimum than the last. Any assessment of this kind of search should be made
+per round, not per segment.
+
+Second, the \emph{last conflicts are not the cheapest}. One lane of the final round reached a
+$2$-conflict state consisting of a single red $K_8$ and a single blue $K_{10}$; an exhaustive check of
+all $73$ edges of those two cliques, together with the intersection condition for a second flip,
+showed that no single flip and no pair of flips removes both, so a repair had to change at least three
+coordinated edges. Breaking a red conflict turns those edges blue and so creates blue conflicts, and
+conversely, which is why the two ends pull against each other. The descent from $29\,814$ to $6$ was
+therefore not the difficult part: it was the last few conflicts that required the search to leave the
+neighbourhood it had been exploring, and the successful segment spent $2\,770$ seconds and
+$159\,966$ iterations on its final six.
+
+Conversely, we found no use for a donor-crossover operator at this scale. Two segments running a
+section-crossover variant, given the same budget from the same states, failed to improve on the plain
+patch move at $96$ conflicts and at $6$ conflicts, while the plain lanes improved at both. This is
+consistent with \cite{cremer}, where crossover is credited with closing a state at $6$--$7$ conflicts
+after the repair stage had plateaued, but we did not reproduce that advantage here.
+
+\section{On the use of AI}\label{sec:ai}
+
+\paragraph{The system.}
+The computational work was carried out by \emph{Open Math Model}, running DeepSeek V4.1 Flash --- a
+model supplied by DeepSeek --- at maximum reasoning effort, operating an ordinary Linux virtual
+machine with four cores. The
+agent wrote all programs, chose the search strategy, ran the experiments and did the bookkeeping; the author set the goal, fixed the compute budget and decided
+which cells to pursue. This is the same division of labour reported in \cite{cremer}.
+
+\paragraph{The screening swarm.}
+The first stage ran as an \emph{Ultramath} swarm: eight identical agents (labelled \texttt{m1} to
+\texttt{m8}) attacking one shared problem concurrently. Each was required to register a distinct line
+of attack before starting --- a duplicate registration is refused --- and the agents exchanged
+findings on a common board rather than working in isolation. The problem given to the swarm was to
+apply the add-a-vertex-then-repair method of \cite{cremer} to as many cells of Table~2.1 as possible
+and to determine, by measurement rather than assertion, which cells it can move. The run lasted four
+hours with a budget of one hundred model steps per member, on the same four cores used later for the
+present computation.
+
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+system & Open Math Model\\
+model & DeepSeek V4.1 Flash\\
+supplier & DeepSeek\\
+reasoning effort & maximum\\
+swarm size & $8$ agents, one shared problem, $10$ distinct directions opened\\
+duration & $4$ hours on $4$ cores\\
+outcome & $8$ submissions, all accepted after independent checking\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{What the swarm contributed.}
+Four things, all of which are used in this paper.
+
+\begin{enumerate}
+\item An \emph{exact twin-insertion table} for nine cells --- for every vertex $v$ and both colours
+      of the joining edge, the number of conflicts created by copying $v$ --- covering the record
+      colourings then available for those cells, several of which are due to Exoo and Tatarevic
+      \cite{exoo-tatarevic}. This is the quantity that
+      determines the starting point of \S\ref{sec:method}, and its minimum over the $688$ choices for
+      the $(8,10)$ cell is $29\,814$.
+\item \emph{Reusable engines.} The exact-conflict repair program used for the descent in
+      \S\ref{sec:method} was written during the swarm, as was a second engine implementing the
+      preparation, risk-chain and crossover stages of \cite{cremer}, a depth-bounded exhaustive
+      repair checker, and a twin-scanning utility.
+\item A \emph{bounded-distance screen}: a CEGAR-SAT encoding that decides, for increasing $k$,
+      whether any valid colouring of the target order lies within Hamming distance $k$ of a given
+      $+1$ state. Applied to six cells, it proved that no valid colouring lies within $9$ to $17$
+      edge changes of the corresponding state --- a statement no heuristic can make --- and thereby
+      established that those cells cannot be moved from those starting colourings by this method at
+      all, however long it runs. The screen is reproduced in Appendix~\ref{app:distance}.
+\item A \emph{negative result about search heuristics}: the conflict count of the $+1$ state does not
+      rank how far a cell is from a solution. One cell with $72$ conflicts after the $+1$ step needed
+      only $9$ edge changes, while another with $6$ needed $13$. Every agent in the swarm, and the
+      author's own initial reading, ranked the cells by conflict count; that ranking was wrong, and
+      the $(8,10)$ cell --- which looked among the least promising, with $29\,814$ initial
+      conflicts --- is the one that moved.
+\end{enumerate}
+
+\paragraph{The final campaign.}
+The swarm finished with no cell moved. The descent reported in \S\ref{sec:method} was run afterwards
+by the agent alone, using the engine from item~2 above, in six rounds of four parallel single-threaded
+lanes over approximately eight hours of wall-clock time. The AI's role in the two stages differed in
+kind: the swarm was useful for breadth and for producing tools and negative results, while the
+positive result came from a long, narrow, single-purpose campaign that no member had the budget to
+run and that the swarm's own screening had not identified as the most likely to succeed.
+
+\paragraph{Verification by the agent, not by the model.}
+Every numeric claim in this paper was recomputed after the fact, outside the search process and
+largely outside the code that produced it, before being recorded: the witness by four independent
+checkers, the twin tables by three separate implementations, the distance bounds against positive
+controls at a known distance, and the search trajectories against exact conflict counts. Two errors
+in the intermediate records were caught this way. A depth-bounded exhaustive repair checker reported a
+repair from a $2$-conflict state at $n=345$ and wrote back an unchanged matrix; an independent
+enumeration of all $73$ candidate first flips showed that no $1$- or $2$-flip repair existed there,
+and that checker's large-$n$ output is not used anywhere in this paper (it is reliable against
+controls at $n=40$ and $n=58$). Separately, an earlier reading of the search described a descent that
+had stalled at $97$ conflicts as approaching a floor; it was seed exhaustion, and the descent resumed
+as soon as the seeds were renewed, as described in \S\ref{sec:method}.
+
+\section{What the computation does not show}\label{sec:not}
+
+\begin{itemize}
+\item The upper bound is unchanged; $\R(8,10)\le 4402$ \cite{ds1} is far from $346$. Nothing here
+      bears on the value of $\R(8,10)$, only on its lower end.
+\item No statement is made about the existence of $(8,10)$-colourings of $K_{346}$. A failed search
+      for one would not be evidence of its non-existence, and we did not run that search.
+\item The colouring is not presented as canonical or as one of a known family. It was found by
+      stochastic search; whether it is isolated among $345$-vertex colourings is open.
+\item The bounded-distance screen of Appendix~\ref{app:distance} produced no bound at any of the
+      cells it covers, and it did not predict the present result: no such screen finishes at
+      $n=345$, so the $(8,10)$ cell was outside what it could decide in either direction.
+\end{itemize}
+
+\section{Reproduction}\label{sec:data}
+
+\paragraph{Artefacts.}
+The colouring is deposited in two encodings:
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+matrix, $345$ rows of \texttt{0}/\texttt{1} ($1$ = red) & \texttt{r810-n345-k8-free-k10-free.txt}\\
+graph6 of the red graph & \texttt{r810-n345-k8-free-k10-red.g6}\\
+\midrule
+SHA-256 of the matrix & \texttt{0af4590108642651e3999994b379235}\\
+ & \texttt{f8b126bb9eb1fdfd36fb450ef47935b12}\\
+SHA-256 of the graph6 file & \texttt{4135f58f2cb289bfa0ab02ca024e1a2}\\
+ & \texttt{d7e5f695aa505e96fa88b4bde54158d62}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Splitting each hash across two lines is a typesetting device only; the two halves are one string.
+
+\paragraph{Search.}
+The search is single-threaded C. The run that produced the colouring was invoked as
+\begin{center}
+\texttt{engine start.txt 8 10 0 run 20000000 32 222 3600 1000 out 1.607 64}
+\end{center}
+from a $345$-vertex input with $6$ conflicts, where the arguments are, in order, the input matrix, the
+forbidden red and blue clique sizes, a colour-convention flag, the mode, an iteration cap, the
+candidate sample size, the random seed, a CPU-second budget, the stall threshold, the output prefix,
+the red weight and a cap on the number of conflicts a flip may create. Inputs are matrices with a
+zero diagonal and $1$ denoting a red edge; the colour convention must be stated explicitly, since
+published witnesses differ in it, and a matrix inverted by hand to change convention acquires a
+non-zero diagonal and will be mis-counted by any clique enumerator that assumes otherwise.
+
+\input{appendix}
+
+\begin{thebibliography}{9}\small
+
+\bibitem{cremer}
+F.~Cremer.
+\newblock Lower bounds for Ramsey numbers: $\R(6,8)\ge 135$ and $\R(8,10)\ge 345$.
+\newblock Preprint, arXiv:2610.12122 [math.CO], 8 October 2026.
+\newblock Colourings at \url{https://github.com/fritzcremer/ramsey-lower-bounds}, release v1.1.0.
+
+\bibitem{ds1}
+S.~P. Radziszowski.
+\newblock Small Ramsey numbers.
+\newblock \emph{Electronic Journal of Combinatorics}, Dynamic Survey DS1, revision 18
+  (24 April 2026), 149 pp.
+
+\bibitem{kuznetsov}
+E.~Kuznetsov.
+\newblock Computational lower limits on small Ramsey numbers.
+\newblock Preprint, arXiv:1505.07186v5 [cs.DM], 2016.
+
+\bibitem{exoo-tatarevic}
+G.~Exoo and M.~Tatarevic.
+\newblock New lower bounds for 28 classical Ramsey numbers.
+\newblock \emph{Electronic Journal of Combinatorics}, 22(3):Paper P3.11, 12 pp., 2015.
+  arXiv:1504.02403.
+
+\bibitem{nagda}
+A.~Nagda, P.~Raghavan, and A.~Thakurta.
+\newblock Reinforced generation of combinatorial structures: Ramsey numbers.
+\newblock Preprint, arXiv:2603.09172v5 [math.CO], 2026.
+
+\bibitem{networkx}
+A.~A. Hagberg, D.~A. Schult, and P.~J. Swart.
+\newblock Exploring network structure, dynamics, and function using NetworkX.
+\newblock In \emph{Proceedings of the 7th Python in Science Conference (SciPy 2008)},
+  pages 11--15, 2008.
+
+\end{thebibliography}
+
+\end{document}

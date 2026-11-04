@@ -1,0 +1,91 @@
+\appendix
+
+\section{How far a repair must travel: an exact bounded-distance screen}\label{app:distance}
+
+The method studied in this paper is a repair: from a colouring that is not yet valid, change edges
+until no forbidden clique remains. Whether that is possible at all is a question about distance, and
+inside a Hamming ball the question is decidable exactly. This appendix records the answers for six
+smaller cells, obtained during the screening stage described in \S\ref{sec:ai}. They are the reason
+the present cell was the one worth pushing, and they delimit the method in a way that no search can.
+
+\subsection*{The question}
+
+Let $B$ be a colouring of $K_{n_0+1}$ obtained by adding one vertex to a valid $(r,s)$-colouring of
+$K_{n_0}$ --- a twin, in the sense of \S\ref{sec:method}. For $k=0,1,2,\dots$ ask:
+
+\begin{center}
+\emph{is there an $(r,s)$-colouring of $K_{n_0+1}$ at Hamming distance at most $k$ from $B$?}
+\end{center}
+
+An unsatisfiable instance at bound $k$ is a proof that \emph{no} sequence of at most $k$ edge changes
+repairs $B$, whatever heuristic is applied. It is therefore a statement about the cell, not about a
+program.
+
+\subsection*{The encoding}
+
+One Boolean variable per edge, with $1$ meaning red. The constraints are that no red $K_r$ and no blue
+$K_s$ exist. The red side is usually small enough to write out in full; the blue side is not --- for
+$n=40$ there are $\binom{40}{10}=8.5\times10^{8}$ ten-sets --- so the clique constraints are added
+lazily: solve, enumerate every violated clique exactly, add the clause forbidding that clique, and
+re-solve. The distance bound is imposed by a totalizer over flip variables
+$d_e \leftrightarrow (x_e \neq B_e)$, asserting $\sum_e d_e \le k$.
+
+Two solvers were used, CaDiCaL~1.5.3 and MiniSat~2.2, and they agree on every bound that both
+completed.
+
+\subsection*{A positive control is mandatory}
+
+An encoding that is too strong returns ``unsatisfiable'' for every input, which looks identical to a
+correct proof. The screen was therefore validated against a case whose answer is known: take a valid
+$(4,6)$-colouring of $K_{35}$, flip $5$ of its edges at random, and require the encoder to return
+satisfiable at $k=5$ with a witness that re-verifies to zero conflicts, and unsatisfiable at $k=4$.
+Both behaviours were observed, and the returned witness was checked by an independent enumerator.
+Without such a control a distance bound is worthless.
+
+\subsection*{Results}
+
+The column $k^\ast$ is the largest $k$ for which unsatisfiability was proved, so a repair from that
+state needs at least $k^\ast+1$ edge changes.
+
+\begin{center}
+\small
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+cell & best twin & conflicts after $+1$ & $k^\ast$ & a repair needs\\
+\midrule
+$(5,6)$ & $v_{56}$, red & $136$ & $16$ & $\ge 17$ edge changes\\
+$(4,6)$ & $v_{31}$, red & $24$ & $16$ & $\ge 17$\\
+$(3,10)$ & $v_{35}$, red & $6$ & $12$ & $\ge 13$\\
+$(4,7)$ & $v_{15}$, red & $40$ & $12$ & $\ge 13$\\
+$(3,11)$ & $v_{20}$, red & $8$ & $10$ & $\ge 11$\\
+$(4,9)$ & $v_{0}$, red & $72$ & $8$ & $\ge 9$\\
+\midrule
+$(6,8)$, $(6,9)$, $(8,10)$ & --- & $338$, $2\,830$, $29\,814$ & none & undecided\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For $(3,10)$ a second, better starting state was also screened: a $40$-vertex colouring with four red
+triangles and no blue $K_{10}$, obtained by choosing the new vertex's red neighbourhood rather than
+copying a vertex. No valid colouring lies within $10$ edge changes of it.
+
+\subsection*{Two conclusions}
+
+\emph{The method cannot move those six cells from those bases.} For $(4,6)$ this is decisive: every
+engine in the study, including one running the complete pipeline of \cite{cremer} with preparation,
+risk chains and mutation, stalls at $12$ conflicts, and the nearest valid $36$-vertex colouring is at
+least $17$ edge changes away. No amount of tuning, restarting or extra seeds closes a gap of $17$.
+
+\emph{Conflict count does not rank repairability.} The $(4,9)$ start has $72$ conflicts and needs only
+$9$ edge changes; the $(3,10)$ start has $6$ --- the smallest in the table, and the natural first
+choice --- and needs $13$. Ranking these cells by how many conflicts the vertex addition creates, which
+is the obvious heuristic and the one adopted at the outset of this work, orders them wrongly. The
+$(8,10)$ cell, which looked the least promising of all with $29\,814$ initial conflicts, is the one
+that moved.
+
+\subsection*{Limits}
+
+The bounds are for the specific best-twin extension of each base colouring; they are not statements
+about the cells, and a colouring of the target order might exist far from those particular states. For
+$(6,8)$, $(6,9)$ and $(8,10)$ no bound was completed --- no rung finishes at those sizes --- so for
+those cells nothing is claimed in either direction, including for the result of this paper.
